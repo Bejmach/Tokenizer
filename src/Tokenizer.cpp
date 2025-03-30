@@ -5,50 +5,8 @@
 Element* Tokenizer::DictFind(std::string str, Dict* dictionary){
 	return SD::Find(dictionary, str);
 }
-std::vector<size_t> Tokenizer::GetPositions(std::string str, std::vector<Element>& dictionary){
-	std::vector<size_t> positions;
-	positions.push_back(0);
 
-	//Get dictionary positions
-	for(int i=0; i<dictionary.size()-1; i++){
-		size_t pos = str.find(dictionary[i].key);
-		size_t wordSize = dictionary[i].key.size();
-		while(pos!=std::string::npos){
-			if(pos==0){
-				positions.push_back(pos+wordSize);
-			}
-			else{
-				positions.resize(positions.size()+2);
-				positions[positions.size()-2] = pos;
-				positions[positions.size()-1] = pos+wordSize;
-			}
-			pos = str.find(dictionary[i].key, pos+1);
-		}
-	}
-
-	//find spaces
-	size_t pos = str.find(" ");
-	while(pos!=std::string::npos){
-		positions.resize(positions.size()+2);
-		positions[positions.size()-2] = pos;
-		positions[positions.size()-1] = pos+1;
-		pos = str.find(" ", pos+1);
-	}
-	//find newLines
-	pos = str.find("\n");
-	while(pos!=std::string::npos){
-		positions.resize(positions.size()+2);
-		positions[positions.size()-2] = pos;
-		positions[positions.size()-1] = pos+1;
-		pos = str.find("\n", pos+1);
-	}
-
-	NO::QuickSort(positions);
-
-	return positions;
-}
-
-std::vector<Element> Tokenizer::CharTokenize(std::string data, Dict* dictionary){
+std::vector<Element> Tokenizer::Tokenize(std::string data, Dict* dictionary){
 	std::vector<Element> tokens;
 
 	std::stringstream stream(data);
@@ -91,7 +49,7 @@ std::vector<Element> Tokenizer::CharTokenize(std::string data, Dict* dictionary)
 
 	return tokens;
 }
-std::vector<std::vector<Element>> Tokenizer::CharLineTokenize(std::string data, Dict* dictionary){
+std::vector<std::vector<Element>> Tokenizer::LineTokenize(std::string data, Dict* dictionary){
 	std::vector<std::vector<Element>> tokens;
 
 	std::stringstream stream(data);
@@ -138,33 +96,4 @@ std::vector<std::vector<Element>> Tokenizer::CharLineTokenize(std::string data, 
 	tokens[line].push_back({"\n", "nl"});
 
 	return tokens;
-}
-
-std::vector<Element> Tokenizer::WordTokenize(std::string str, std::vector<Element>& dictionary, Dict* additionalDict){
-	std::vector<Element> returner;
-	std::vector<size_t> positions = GetPositions(str, dictionary);
-	
-	for(int i=1; i<positions.size(); i++){
-		if(positions[i-1] == positions[i]){
-			continue;
-		}
-
-		std::string token = str.substr(positions[i-1], positions[i]-positions[i-1]);
-		if(token!=" "){
-			
-			Element pushedElement;
-			if(additionalDict!=nullptr){
-				Element* foundElement = SD::Find(additionalDict, token);
-				pushedElement = (foundElement!=nullptr)?*foundElement:Element({"",""});
-			}
-			else{
-				pushedElement = SD::Find(dictionary, token);
-			}
-			if(pushedElement.key == ""){
-				pushedElement = {token, "local"};
-			}
-			returner.push_back(pushedElement);
-		}
-	}
-	return returner;
 }
