@@ -2,7 +2,6 @@
 #define TOKENIZER_H
 
 #include<StringDict.h>
-#include<NumberOperations.h>
 
 class Tokenizer{
 	private:
