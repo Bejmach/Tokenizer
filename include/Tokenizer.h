@@ -3,13 +3,20 @@
 
 #include<StringDict.h>
 
+enum class TokenType{Undefined, Keyword, Operator, Delimiter, Type, Number, Literal, Identyfier, End};
+
+struct Token{
+	TokenType type;
+	std::string value;
+};
+
 class Tokenizer{
 	private:
 		static Element* DictFind(std::string str, Dict* dictionary);
+		static Token ToToken(Element);
 
 	public:
-		static std::vector<Element> Tokenize(std::string str, Dict* dictionary);
-		static std::vector<std::vector<Element>> LineTokenize(std::string str, Dict* dictionary);
+		static std::vector<Token> Tokenize(std::string str, Dict* dictionary);
 
 };
 
